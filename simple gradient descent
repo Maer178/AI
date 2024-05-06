@@ -1,0 +1,25 @@
+def g(x):
+    return 2 * (x-1)
+
+learning_rate = 0.01
+
+x_begin =2
+
+end_point = 1
+
+x_final = end_point
+
+iterations_num = 0
+
+while True:
+    x_final = x_begin - learning_rate * g(x_begin)
+    if(x_final == x_begin or x_final <= end_point):
+        break
+    elif(x_final != x_begin):
+        iterations_num += 1
+
+    x_begin = x_final
+
+    print(x_final, iterations_num )
+
+print(f"Gradient descent converged at x = {x_final} after {iterations_num} iterations")
