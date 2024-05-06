@@ -1,0 +1,44 @@
+pip install ucimlrepo
+
+from ucimlrepo import fetch_ucirepo
+
+# fetch dataset
+optical_recognition_of_handwritten_digits = fetch_ucirepo(id=80)
+
+# data (as pandas dataframes)
+X = optical_recognition_of_handwritten_digits.data.features
+y = optical_recognition_of_handwritten_digits.data.targets
+
+# metadata
+print(optical_recognition_of_handwritten_digits.metadata)
+
+# variable information
+print(optical_recognition_of_handwritten_digits.variables)
+
+X
+
+y
+
+from tensorflow import keras
+from keras import Sequential
+from keras.layers import Dense
+
+model = keras.Sequential([
+  keras.layers.Dense(64, activation='relu', input_shape=(64,)),# it takes (num_of_time steps , num_of_features )
+  keras.layers.Dense(32, activation='relu'),
+  keras.layers.Dense(16, activation='softmax')
+])
+
+model.compile(
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=['accuracy']
+    )
+
+model.summary()
+
+model.fit(X_train, y_train, epochs=20)
+
+# Evaluate the model on the test set
+loss, accuracy = model.evaluate(X_test, y_test)
+print("Test Accuracy:", accuracy)
