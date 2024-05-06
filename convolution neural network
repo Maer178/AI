@@ -1,0 +1,36 @@
+import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# Define LeNet-5 model
+def LeNet5(input_shape):
+    model = models.Sequential()
+
+    # Layer 1: Convolutional Layer
+    model.add(layers.Conv2D(6, kernel_size=(5, 5), strides=(1, 1), activation='relu', input_shape=input_shape))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+    # Layer 2: Convolutional Layer
+    model.add(layers.Conv2D(16, kernel_size=(5, 5), strides=(1, 1), activation='relu'))
+    model.add(layers.MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+    # Flatten the output for fully connected layers
+    model.add(layers.Flatten())
+
+    # Layer 3: Fully Connected Layer
+    model.add(layers.Dense(120, activation='relu'))
+
+    # Layer 4: Fully Connected Layer
+    model.add(layers.Dense(84, activation='relu'))
+
+    # Output Layer
+    model.add(layers.Dense(10, activation='softmax'))  # Assuming 10 classes for classification
+
+    return model
+
+  
+# Create LeNet-5 model
+input_shape = (32, 32, 1)  # Input shape for MNIST dataset (assuming grayscale images of size 32x32)
+lenet_model = LeNet5(input_shape)
+
+# Display model summary
+lenet_model.summary()
