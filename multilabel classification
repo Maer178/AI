@@ -1,0 +1,54 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import accuracy_score
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import Adam
+
+# Load the dataset
+train_data = pd.read_csv("/content/train.csv")
+test_data = pd.read_csv("/content/test.csv")
+
+# Concatenate train and test data for preprocessing
+all_data = pd.concat([train_data, test_data])
+
+# Preprocess the data
+X = all_data['ABSTRACT']
+# this code to read the topics in the paper
+y = all_data['ABSTRACT'].str.split(';').apply(lambda x: [topic.strip() for topic in x])
+
+# Use MultiLabelBinarizer to convert topics into binary labels
+mlb = MultiLabelBinarizer()
+y_binary = mlb.fit_transform(y)
+
+
+# Splitting data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y_binary, test_size=0.2, random_state=42)
+
+# Tokenize text data
+max_words = 1000
+vectorizer = CountVectorizer(max_features=max_words)
+X_train_vec = vectorizer.fit_transform(X_train).toarray()
+X_test_vec = vectorizer.transform(X_test).toarray()
+
+
+# Define the Keras model
+model = Sequential()
+model.add(Dense(64, input_shape=(max_words,), activation='relu'))
+model.add(Dropout(0.5))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(y_train.shape[1], activation='sigmoid'))
+
+# Compile the model
+optimizer = Adam(lr=0.001)
+model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+
+
+# Train the model
+history = model.fit(X_train_vec, y_train, epochs=100, batch_size=32, validation_split=0.2)
+
+# Evaluate the model
+loss, accuracy = model.evaluate(X_test_vec, y_test)
+print("Test Accuracy:", accuracy)
